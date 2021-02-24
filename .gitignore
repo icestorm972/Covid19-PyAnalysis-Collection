@@ -2,9 +2,8 @@
 data/NPGEO/*
 data/RKI/*
 data/SurvStat/*
-!data/NPGEO/README.txt
-!data/RKI/README.txt
-!data/SurvStat/README.txt
+!data/NPGEO/README.*
+!data/SurvStat/README.*
 src/_TODO/
 
 # Output is not part of the repository
