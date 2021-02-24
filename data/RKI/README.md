@@ -1,5 +1,5 @@
 # RKI Covid-19 CSV und XLSX
-Hier müssen sich die verschiednen Dateien von der ["Neuartiges Coronavirus" Projektseite auf der RKI Homepage](https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Projekte_RKI/) befinden.
+Hier müssen sich die verschiedenen Dateien von der ["Neuartiges Coronavirus" Projektseite auf der RKI Homepage](https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Projekte_RKI/) befinden.
 
 Diese stehen (bisher) nichts als Archiv zur Verfügung und werden entweder täglich oder wöchentlich beim RKI aktualisiert.
 Und müssen daher selbst von Hand heruntergeladen werden. Aktualisierungstag-Hinweise sind nach Wissensstand 23.02.2021.
