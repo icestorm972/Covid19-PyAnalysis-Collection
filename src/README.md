@@ -44,4 +44,4 @@ conda install -c conda-forge pyarrow
 ```
 spyder
 ```
-Über Menü>Projects>Open Projekt den "src" Ordner auswählen.
+Über Menü>Projects>New Projekt das Projekt anlegen ("src" Ordner auswählen, kein neuer Ordner).
