@@ -5,18 +5,14 @@ Es gibt noch [alternative Distributionen](https://wiki.python.org/moin/PythonDis
 
 # Packages
 List der benutzten Packages (noch zu ergänzen):
-* spyder
-* numpy
-* scipy
-* pandas
-* matplotlib
-* seaborn
+* anaconda (spyder, numpy, scipy, pandas, matplotlib, seaborn, ...)
 * pyarrow
-* fastparquet
 * ...
 
 # Python Skripte
-* fig_util.py: 
+* fig_util.py: Enthält Hilfsfunktion für matplotlib figures, um PNG mit definierter Breite/Höhe zu erhalten
+* npgeo_reader.py: Enthält Interface/Datenimport Klasse zu NPGEO/RKI CSV Dateien
+* analyze_deaths.py: Nowcast Skript für Verstorbene nach Meldedatum
 
 # Anaconda/Miniconda
 Die folgenden Infos sind für die Miniconda/Anaconda Distribution.
