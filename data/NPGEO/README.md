@@ -1,6 +1,6 @@
 # NPGEO/RKI Datenarchiv
 In diesem Verzeichnis/Folder muss sich die Sammlung der NPGEO/RKI csv Dateien befinden.
-Namensschema: RKI_COVID19_YYYY-MM-DD.csv
+* Namensschema: RKI_COVID19_YYYY-MM-DD.csv
 
 ## Generell
 Die Daten sind die "Fallzahlen in Deutschland" des [Robert Koch-Institut (RKI)](https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Fallzahlen.html) und stehen unter der [Open Data Datenlizenz Deutschland – Namensnennung – Version 2.0](https://www.govdata.de/dl-de/by-2-0)(dl-de/by-2-0) zur Verfügung.
@@ -16,13 +16,13 @@ Die Daten sind die "Fallzahlen in Deutschland" des [Robert Koch-Institut (RKI)](
 * [Robert Koch-Institut](https://www.rki.de/DE/Home/homepage_node.html)
 * [Bundesamt für Kartographie und Geodäsie](https://www.bkg.bund.de/DE/Home/home.html)
 
-##Quellenvermerk:
+## Quellenvermerk:
 Robert Koch-Institut (RKI), dl-de/by-2-0
 
-##Offizielle Haupt-Quelle (nur tagesaktueller Stand!)
+## Offizielle Haupt-Quelle (nur tagesaktueller Stand!)
 https://www.arcgis.com/home/item.html?id=f10774f1c63e40168479a1feb6c7ca74
 
-##Inoffizielle Archive, soweit bekannt
+## Inoffizielle Archive, soweit bekannt
 * https://github.com/CharlesStr/CSV-Dateien-mit-Covid-19-Infektionen-
 * https://github.com/ihucos/rki-covid19-data
 * https://github.com/micb25/RKI_COVID19_DATA/
