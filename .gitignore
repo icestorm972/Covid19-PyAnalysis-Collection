@@ -1,3 +1,15 @@
+# Data is not part of the repository
+data/NPGEO/*
+data/RKI/*
+data/SurvStat/*
+!data/NPGEO/README.txt
+!data/RKI/README.txt
+!data/SurvStat/README.txt
+src/_TODO/
+
+# Output is not part of the repository
+output/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
