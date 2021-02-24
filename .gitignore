@@ -3,6 +3,7 @@ data/NPGEO/*
 data/RKI/*
 data/SurvStat/*
 !data/NPGEO/README.*
+!data/RKI/README.*
 !data/SurvStat/README.*
 src/_TODO/
 
