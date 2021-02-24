@@ -18,7 +18,6 @@ Und müssen daher selbst von Hand heruntergeladen werden. Aktualisierungstag-Hin
 * **Hinweis:** Benötigt für Nicht-Nowcast basierte CFR (z.Z. nicht im GitHub Projekt enthalten)
 
 ## Nowcasting
-https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Projekte_RKI/Nowcasting.html
 * **Quelle:** [Nowcasting und R-Schätzung: Schätzung der aktuellen Entwicklung der SARS-CoV-2-Epidemie in Deutschland](https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Projekte_RKI/Nowcasting.html)
 * **Namensschema:** Nowcasting_Zahlen_csv_RKI-YYYY-MM-DD.csv
 * **Aktualisierung:** Täglich
