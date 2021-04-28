@@ -104,18 +104,19 @@ def download_arcgis_csv(output_path = DOWNLOAD_OUTPUT_PATH, url = ARCGIS_RKI_URL
     fname_s = file_name.split('.')
     
     if not date_filter is None:
-        file_name2 = '{:s}/{:s}_{:s}.{:s}'.format(
+        file_name2 = os.path.abspath('{:s}/{:s}_{:s}.{:s}'.format(
                 output_path,
                 fname_s[0],
                 date_filter,
-                fname_s[1])
+                        fname_s[1]))
         if os.path.isfile(file_name2):
-            print('\n  WARNING: {:s} already exists! Renaming old file'.format(
-                file_name2))
+            base_filename2 = os.path.basename(file_name2)
+            print('\n  WARNING: {:s} already exists!\n           Renaming old file to'.format(
+                base_filename2))
             
             if not os.path.isfile(file_name2 + '.bak'):
                 os.rename(file_name2, file_name2 + '.bak')
-                print('           to ' + file_name2 + '.bak\n')
+                print('           ' + base_filename2 + '.bak\n')
             else:
                 cnt = 0
                 while os.path.isfile(file_name2 + '.{:03d}.bak'.format(
@@ -123,7 +124,7 @@ def download_arcgis_csv(output_path = DOWNLOAD_OUTPUT_PATH, url = ARCGIS_RKI_URL
                     cnt += 1
                 os.rename(file_name2, file_name2 + '.{:03d}.bak'.format(
                         cnt))
-                print('           to ' + file_name2 + '.{:03d}.bak\n'.format(
+                print('           ' + base_filename2 + '.{:03d}.bak\n'.format(
                         cnt))
     
 
@@ -147,7 +148,10 @@ def download_arcgis_csv(output_path = DOWNLOAD_OUTPUT_PATH, url = ARCGIS_RKI_URL
             # dl => downloaded bytes
             dl = 0
             total_length = int(total_length)
-            print('  Total length: {:d} bytes'.format(total_length))
+            if is_gzip:
+                print('  Compressed download size: {:21,d} bytes'.format(total_length))
+            else:
+                print('  Uncompressed download/file size: {:14,d} bytes'.format(total_length))
     
             # 256 kile byte per progress bar update
             chunk_size = 256*1024
@@ -162,32 +166,38 @@ def download_arcgis_csv(output_path = DOWNLOAD_OUTPUT_PATH, url = ARCGIS_RKI_URL
                     
                     # update progress bar (length 50 characters)
                     dl += len(chunk)                     
-                    done = int(50 * dl / total_length)
-                    if done < 50:
-                        sys.stdout.write("\r[%s%s%s]" % (
+                    done = int(51 * dl / total_length)
+                    if done < 51:
+                        sys.stdout.write("\r  [%s%s%s]" % (
                                 '=' * done,
                                 prgc[ccnt % 4],
-                                ' ' * (49-done))
+                                ' ' * (51-1-done))
                             )
                     else:
-                        sys.stdout.write("\r[%s]" % ('=' * done) )    
+                        sys.stdout.write("\r  [%s]" % ('=' * done) )    
                     sys.stdout.flush()   
                     
                     ccnt += 1
     
+            sys.stdout.write("\n")    
+            sys.stdout.flush()   
     
     # create dummy filename. The correct date is applied later => rename
-    file_name1 = '{:s}/{:s}_{:s}.{:s}'.format(
+    file_name1 = os.path.abspath('{:s}/{:s}_{:s}.{:s}'.format(
             output_path,
             fname_s[0],
             'YYYY_MM_DD',
-            fname_s[1])
+                    fname_s[1]))
 
     if is_gzip:
         # unzip downloaded file
         with open(file_name1, 'wb') as f_out:
             with gzip.open(download_fstr, 'rb') as f_in:
                 shutil.copyfileobj(f_in, f_out)
+        
+        print('  Uncompressed file size: {:23,d} bytes'.format(
+            os.path.getsize(file_name1)
+            ))
     else:
         # just copy csv
         with open(file_name1, 'wb') as f_out:
@@ -211,11 +221,11 @@ def download_arcgis_csv(output_path = DOWNLOAD_OUTPUT_PATH, url = ARCGIS_RKI_URL
         res = False
     
     # create final filename
-    file_name2 = '{:s}/{:s}_{:s}.{:s}'.format(
+    file_name2 = os.path.abspath('{:s}/{:s}_{:s}.{:s}'.format(
             output_path,
             fname_s[0],
             new_base_name,
-            fname_s[1])
+            fname_s[1]))
     
     # rename file to final filename
     os.rename(file_name1, file_name2)    
