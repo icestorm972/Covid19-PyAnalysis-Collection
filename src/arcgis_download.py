@@ -28,29 +28,46 @@ DOWNLOAD_OUTPUT_PATH = '.'
 # * checks for correct date (either parameter or todays date)
 # * if that fails, try to use secondary URL (slow, US AWS server, raw csv)
 #
-# parameter: expected_date: str. Default = None.
-#            if None => use today's date for check
-#            otherwise 'YYYY-MM-DD' string for check
+# parameter: 
+#   output_path:   str. Default = DOWNLOAD_OUTPUT_PATH
+#                  output folder path to save csv files
+#   expected_date: str. Default = None.
+#                  if None => use today's date for check
+#                  otherwise 'YYYY-MM-DD' string for check
 # returns tuple
 #   success: boo.  True = csv was downloaded
 #   filename: str. Filename incl. path to csv
-def download_RKI_COVID19_csv(expected_date = None):
+def download_RKI_COVID19_csv(output_path = DOWNLOAD_OUTPUT_PATH, expected_date = None):
     if expected_date is None:
         expected_date = pd.Timestamp.now().strftime('%Y-%m-%d')
+        
+    # check output path
+    op_valid = False
+    try:
+        if os.path.isdir(output_path):
+            op_valid = True
+    except:
+        pass
+    
+    if not op_valid:
+        print('\nERROR: output path {:s} doesn''t exist!'.format(
+                output_path))
+        return False, ''
+    output_path = os.path.abspath(output_path)
+    print('Download folder: {:s}'. format(output_path))
 
     print('Trying 1st URL:')
-    res, fname = download_arcgis_csv(ARCGIS_RKI_URL, expected_date)
+    res, fname = download_arcgis_csv(output_path, ARCGIS_RKI_URL, expected_date)
     if res == False:
         print('Trying 2nd URL:')
-        res, fname = download_arcgis_csv(ARCGIS_RKI_URL2, expected_date)
+        res, fname = download_arcgis_csv(output_path, ARCGIS_RKI_URL2, expected_date)
 
     return res, fname
 
 # Quellen:
 # 1) https://stackoverflow.com/questions/25749345/how-to-download-gz-files-with-requests-in-python-without-decoding-it
 # 2) https://stackoverflow.com/questions/15644964/python-progress-bar-and-downloads
-def download_arcgis_csv(url = ARCGIS_RKI_URL, date_filter = None):
-    
+def download_arcgis_csv(output_path = DOWNLOAD_OUTPUT_PATH, url = ARCGIS_RKI_URL, date_filter = None):
     prgc = ['|', '/', '-', '\\']
     
     # start request of download. 
@@ -87,8 +104,8 @@ def download_arcgis_csv(url = ARCGIS_RKI_URL, date_filter = None):
     fname_s = file_name.split('.')
     
     if not date_filter is None:
-        file_name2 = '{:s}\\{:s}_{:s}.{:s}'.format(
-                DOWNLOAD_OUTPUT_PATH,
+        file_name2 = '{:s}/{:s}_{:s}.{:s}'.format(
+                output_path,
                 fname_s[0],
                 date_filter,
                 fname_s[1])
@@ -118,7 +135,7 @@ def download_arcgis_csv(url = ARCGIS_RKI_URL, date_filter = None):
         tmp_ext = 'gz'
 
     # setup download of gzip file in temporary directory
-    download_fstr = '{:s}\\{:s}_download.{:s}'.format(
+    download_fstr = '{:s}/{:s}_download.{:s}'.format(
         tempfile.gettempdir(), file_name, tmp_ext)
     
     # start download stream
@@ -160,8 +177,8 @@ def download_arcgis_csv(url = ARCGIS_RKI_URL, date_filter = None):
     
     
     # create dummy filename. The correct date is applied later => rename
-    file_name1 = '{:s}\\{:s}_{:s}.{:s}'.format(
-            DOWNLOAD_OUTPUT_PATH,
+    file_name1 = '{:s}/{:s}_{:s}.{:s}'.format(
+            output_path,
             fname_s[0],
             'YYYY_MM_DD',
             fname_s[1])
@@ -194,8 +211,8 @@ def download_arcgis_csv(url = ARCGIS_RKI_URL, date_filter = None):
         res = False
     
     # create final filename
-    file_name2 = '{:s}\\{:s}_{:s}.{:s}'.format(
-            DOWNLOAD_OUTPUT_PATH,
+    file_name2 = '{:s}/{:s}_{:s}.{:s}'.format(
+            output_path,
             fname_s[0],
             new_base_name,
             fname_s[1])
@@ -203,3 +220,8 @@ def download_arcgis_csv(url = ARCGIS_RKI_URL, date_filter = None):
     # rename file to final filename
     os.rename(file_name1, file_name2)    
     return res, file_name2
+
+if __name__ == "__main__":
+    download_RKI_COVID19_csv(
+        output_path = DOWNLOAD_OUTPUT_PATH, 
+        expected_date = None)
