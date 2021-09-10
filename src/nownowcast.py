@@ -25,14 +25,22 @@ from IPython.display import display, Image
 
 SLATE = (0.15, 0.15, 0.15)
 
-OUTPUT_DIR = 'D:\\COVID-19\\output\\RNowcast\\anim\\'
+WD_ARR = {
+    1: 'Montag',
+    2: 'Dienstag',
+    3: 'Mittwoch',
+    4: 'Donnerstag',
+    5: 'Freitag',
+    6: 'Samstag',
+    7: 'Sonntag'
+    }
 
-# ARCHIVE_PATH = 'D:\\COVID-19\\data\\RKI\\Nowcast'
+OUTPUT_DIR = '..\\output\\RNowcast\\anim\\'
+
 ARCHIVE_URL = 'https://github.com/robert-koch-institut/SARS-CoV-2-Nowcasting_und_-R-Schaetzung/raw/main/Archiv/Nowcast_R_{:s}.csv'
 
 INPUT_DATA_RANGE = ['2021-03-16', dt.now().strftime('%Y-%m-%d')]
 PLOT_MAX_DATE = '2021-09-30'
-#INPUT_DATA_RANGE = ['2021-06-30', '2021-07-10']
 
 dataset_date_range = pd.date_range(*INPUT_DATA_RANGE)
 
@@ -67,7 +75,6 @@ for i in range(dataset_date_range.size):
         # two steps:
         data = pd.read_csv(
             ARCHIVE_URL.format(dataset_date_str),
-            #index_col = 'Datum',
             parse_dates = True,
             sep=';', decimal=',',
             skip_blank_lines=False
@@ -122,6 +129,10 @@ rep_tri3.loc[:,:] = rep_tri2
 
 rep_tri4 = rep_tri3.iloc[:-14, :].div(rep_tri3.apply(lambda s: s[pd.Series.last_valid_index(s)], axis=1), axis=0)
 
+
+
+# %%
+
 q10_dist = pd.DataFrame(index=r_cols, columns=range(1,7,1))
 lq_dist = pd.DataFrame(index=r_cols, columns=range(1,7,1))
 med_dist = pd.DataFrame(index=r_cols, columns=range(1,7,1))
@@ -130,15 +141,6 @@ q90_dist = pd.DataFrame(index=r_cols, columns=range(1,7,1))
 
 max_days_offset = r_cols.max()
 
-wd_arr = {
-    1: 'Montag',
-    2: 'Dienstag',
-    3: 'Mittwoch',
-    4: 'Donnerstag',
-    5: 'Freitag',
-    6: 'Samstag',
-    7: 'Sonntag'
-    }
 
 for i in range(7):
     iwd = rep_tri4.index[i].isoweekday()
@@ -157,7 +159,7 @@ for i in range(7):
                            hspace = 0.1)
     ax = fig.add_subplot(gs[0, 0])
     
-    fig.suptitle('COVID-19 - Variation des RKI Nowcasts der Fallzahlen über Datenstand-Alter nach Wochentag: {:s}'.format(wd_arr[iwd]),
+    fig.suptitle('COVID-19 - Variation des RKI Nowcasts der Fallzahlen über Datenstand-Alter nach Wochentag: {:s}'.format(WD_ARR[iwd]),
                     horizontalalignment='center',
                     verticalalignment='center', 
                     fontsize=21, color=SLATE, y=0.91)
@@ -205,7 +207,7 @@ for i in range(7):
     
     if False:
         exp_full_fname = '{:s}{:s}_{:d}_{:s}.png'.format(
-            'D:\\COVID-19\\output\\', 'Nowcast_Var', iwd, wd_arr[iwd])
+            OUTPUT_DIR + '..\\', 'Nowcast_Var', iwd, WD_ARR[iwd])
         
         print('Saving ' + exp_full_fname)
         fig_util.set_size(fig, (1920.0/100.0, 1080.0/100.0), dpi=100, pad_inches=0.35)
@@ -543,7 +545,7 @@ if False:
         fontsize=11.5)
     
     exp_full_fname = '{:s}{:s}.png'.format(
-        'D:\\COVID-19\\output\\RNowcast\\', 'Nowcasts_RKI_orig')
+        OUTPUT_DIR + '..\\', 'Nowcasts_RKI_orig')
     
     print('Saving ' + exp_full_fname)
     fig_util.set_size(fig, (1920.0/100.0, 1080.0/100.0), dpi=100, pad_inches=0.35)
@@ -643,7 +645,7 @@ if False:
         fontsize=11.5)
     
     exp_full_fname = '{:s}{:s}.png'.format(
-        'D:\\COVID-19\\output\\RNowcast\\', 'Nowcasts_RKI_geom')
+        OUTPUT_DIR + '..\\', 'Nowcasts_RKI_geom')
     
     print('Saving ' + exp_full_fname)
     fig_util.set_size(fig, (1920.0/100.0, 1080.0/100.0), dpi=100, pad_inches=0.35)
@@ -736,7 +738,7 @@ if False:
         fontsize=11.5)
     
     exp_full_fname = '{:s}{:s}.png'.format(
-        'D:\\COVID-19\\output\\RNowcast\\', 'Nowcasts_RKI_korr')
+        OUTPUT_DIR + '..\\', 'Nowcasts_RKI_korr')
     
     print('Saving ' + exp_full_fname)
     fig_util.set_size(fig, (1920.0/100.0, 1080.0/100.0), dpi=100, pad_inches=0.35)
