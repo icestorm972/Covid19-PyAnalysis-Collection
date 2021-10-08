@@ -5,7 +5,11 @@ Created on Sat Aug 14 19:01:45 2021
 @author: David
 """
 
+from pathlib import Path
 from datetime import datetime as dt
+
+import zipfile
+
 
 import numpy as np
 
@@ -36,11 +40,14 @@ WD_ARR = {
     }
 
 OUTPUT_DIR = '..\\output\\RNowcast\\anim\\'
+OUTPUT_DIR = 'D:\\COVID-19\\output\\RNowcast\\anim\\'
 
-ARCHIVE_URL = 'https://github.com/robert-koch-institut/SARS-CoV-2-Nowcasting_und_-R-Schaetzung/raw/main/Archiv/Nowcast_R_{:s}.csv'
+ARCHIVE_FPATH = '..\\data\\RKI\\Nowcasting\\Nowcast_R_{:s}.csv'
+ARCHIVE_ZIP_URL = 'https://github.com/robert-koch-institut/SARS-CoV-2-Nowcasting_und_-R-Schaetzung/archive/refs/heads/main.zip'
+#'https://github.com/robert-koch-institut/SARS-CoV-2-Nowcasting_und_-R-Schaetzung/raw/main/Archiv/Nowcast_R_{:s}.csv'
 
 INPUT_DATA_RANGE = ['2021-03-16', dt.now().strftime('%Y-%m-%d')]
-PLOT_MAX_DATE = '2021-09-30'
+PLOT_MAX_DATE = '2021-10-31'
 
 dataset_date_range = pd.date_range(*INPUT_DATA_RANGE)
 
@@ -49,6 +56,7 @@ r_idx_min = dataset_date_range[0] - pd.DateOffset(days=4)
 r_idx = pd.date_range(r_idx_min, dataset_date_range[-5].strftime('%Y-%m-%d'))
 r_cols = pd.Int64Index(range(4, 4+7*6, 1))
 
+Path(OUTPUT_DIR).mkdir(parents=True, exist_ok=True)
 
 
 # %%
@@ -67,21 +75,21 @@ for i in range(dataset_date_range.size):
     
     try:
         data = pd.read_csv(
-            ARCHIVE_URL.format(dataset_date_str),
+            ARCHIVE_FPATH.format(dataset_date_str),
             index_col = 'Datum',
             parse_dates = True
             )
     except ValueError:
         # two steps:
         data = pd.read_csv(
-            ARCHIVE_URL.format(dataset_date_str),
+            ARCHIVE_FPATH.format(dataset_date_str),
             parse_dates = True,
             sep=';', decimal=',',
             skip_blank_lines=False
             )
         extra_rows = data.index.size - data.index[data.Datum.isna()][0]
         data = pd.read_csv(
-            ARCHIVE_URL.format(dataset_date_str),
+            ARCHIVE_FPATH.format(dataset_date_str),
             index_col = 'Datum',
             parse_dates = True,
             sep=';', decimal=',',
@@ -993,6 +1001,7 @@ else:
     
     print('Saving ' + exp_full_fname)
     fig_util.set_size(fig, (1920.0/100.0, 1080.0/100.0), dpi=100, pad_inches=0.35)
+    #fig_util.force_fig_size(fig, (1920.0, 1080.0), dpi=100, pad_inches=0.35)
     
     fig.savefig(exp_full_fname, dpi=100, bbox_inches='tight', pad_inches=0.35)
     display(Image(filename=exp_full_fname))
