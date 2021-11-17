@@ -9,7 +9,7 @@ from pathlib import Path
 from datetime import datetime as dt
 
 import zipfile
-
+import os.path
 
 import numpy as np
 
@@ -46,8 +46,19 @@ ARCHIVE_FPATH = '..\\data\\RKI\\Nowcasting\\Nowcast_R_{:s}.csv'
 ARCHIVE_ZIP_URL = 'https://github.com/robert-koch-institut/SARS-CoV-2-Nowcasting_und_-R-Schaetzung/archive/refs/heads/main.zip'
 #'https://github.com/robert-koch-institut/SARS-CoV-2-Nowcasting_und_-R-Schaetzung/raw/main/Archiv/Nowcast_R_{:s}.csv'
 
+SPECIFIC_DAY = None
+#SPECIFIC_DAY = '2021-09-24'
+#SPECIFIC_DAY = '2021-10-08'
+#SPECIFIC_DAY = '2021-11-12'
+
+
 INPUT_DATA_RANGE = ['2021-03-16', dt.now().strftime('%Y-%m-%d')]
-PLOT_MAX_DATE = '2021-10-31'
+PLOT_MAX_DATE = '2021-12-31'
+
+
+
+if not SPECIFIC_DAY is None:
+    INPUT_DATA_RANGE[1] = SPECIFIC_DAY
 
 dataset_date_range = pd.date_range(*INPUT_DATA_RANGE)
 
@@ -73,6 +84,7 @@ for i in range(dataset_date_range.size):
     dataset_date_str = dataset_date.strftime('%Y-%m-%d')
     print(dataset_date_str)
     
+    #if os.path.isfile(ARCHIVE_FPATH.format(dataset_date_str)):
     try:
         data = pd.read_csv(
             ARCHIVE_FPATH.format(dataset_date_str),
@@ -181,7 +193,7 @@ for i in range(7):
     ax.yaxis.set_minor_locator(MultipleLocator(5))
     ax.set_xlim([-1, 11])
     
-    ax.tick_params(which='minor', length=0, width=0)
+    ax.tick_params(which='minor', length=0, width=0, pad=10)
     ax.tick_params(axis=u'both', labelsize=16, labelcolor = SLATE)
     ax.grid(True, which='major', axis='both', linestyle='-',  color=(0.85,0.85,0.85))
     ax.grid(True, which='minor', axis='both', linestyle='-',  color=(0.95,0.95,0.95))
@@ -213,7 +225,7 @@ for i in range(7):
         fontsize=11.5)
     
     
-    if False:
+    if True:
         exp_full_fname = '{:s}{:s}_{:d}_{:s}.png'.format(
             OUTPUT_DIR + '..\\', 'Nowcast_Var', iwd, WD_ARR[iwd])
         
@@ -1007,3 +1019,84 @@ else:
     display(Image(filename=exp_full_fname))
     plt.close()
     
+    
+    
+# %%
+if True:
+    fig = plt.figure(figsize=(16,9))
+    gs = gridspec.GridSpec(2, 1, figure=fig, 
+                       height_ratios = [14, 3],
+                       hspace = 0.1)
+    ax = fig.add_subplot(gs[0, 0])
+    
+    fig.suptitle('COVID-19 - Ableitung des Wochentagkorrigierten Punktschätzers$^{{*)}}$ des RKI 7-Tage-R - {:s}'.format(dataset_date_str),
+                    horizontalalignment='center',
+                    verticalalignment='center', 
+                    fontsize=21, color=SLATE, y=0.91)
+    
+    plt.fill_between(x[:-4], np.zeros((x.size-4,)), np.diff(y[:-3]), facecolor=(0.0,0.0,1.0))
+    
+    
+    
+    ax.set_ylim([-0.05, 0.05])
+    ax.yaxis.set_major_locator(MultipleLocator(0.01))
+    ax.yaxis.set_minor_locator(MultipleLocator(0.002))
+    
+    #ax.set_xlim([r_idx[0], r_idx[-1]])
+    ax.set_xlim([
+        pd.to_datetime(r_idx[0]),
+        pd.to_datetime(PLOT_MAX_DATE)
+        ])
+    
+    date_form = DateFormatter("%d.%m.\n%Y")
+    ax.xaxis.set_major_formatter(date_form)
+    ax.xaxis.set_major_locator(mdates.WeekdayLocator(interval=2, byweekday=0))
+    ax.xaxis.set_minor_locator(mdates.DayLocator())
+    
+    
+    ax.tick_params(which='minor', length=0, width=0)
+    ax.tick_params(axis=u'both', labelsize=16, labelcolor = SLATE)
+    ax.grid(True, which='major', axis='both', linestyle='-',  color=(0.85,0.85,0.85))
+    ax.grid(True, which='minor', axis='both', linestyle='-',  color=(0.95,0.95,0.95))
+    
+    ax.set_ylabel('Tägliche Änderung der W.k. 7-Tage Reproduktionszahl R', fontdict={'fontsize': 18}, fontsize=18, color = SLATE, labelpad=14)
+    ax.set_xlabel('Geschätztes Erkrankungsdatum', fontdict={'fontsize': 18}, fontsize=18, color = SLATE, labelpad=14)
+    
+    
+    ax2 = fig.add_subplot(gs[1, 0])
+    
+    ax2.axis('off')
+    
+    
+    if dataset_date_range[0].year == dataset_date_range[-1].year:
+        Datenstand_range_str = (
+            dataset_date_range[0].strftime('%d.%m.-') + 
+            dataset_date_range[-1].strftime('%d.%m.%Y') )
+    else:
+        Datenstand_range_str = (
+            dataset_date_range[0].strftime('%d.%m.%y-') + 
+            dataset_date_range[-1].strftime('%d.%m.%Y') )
+    
+    
+    plt.text(0, 0.05,
+        'Datenquelle:\n' + 
+        'Robert Koch-Institut (RKI), an der Heiden, Matthias (2021): SARS-CoV-2-Nowcasting und -R-Schaetzung, Berlin: Zenodo. DOI:10.5281/zenodo.4680400\n'+
+        'URL: https://github.com/robert-koch-institut/SARS-CoV-2-Nowcasting_und_-R-Schaetzung ; ' +
+        'Abfragedatum/Datenstand: ' + Datenstand_range_str + '; eigene Berechnung/eigene Darstellung;\n' +
+        'Datenlizenz CC-BY 4.0 International               '+
+        '$^{*)}$ gleitender geometrischer Mittelwert (Wurzel der Produkte)',
+        fontsize=11.5)
+    
+    if False:
+        plt.show()
+    else:
+        exp_full_fname = '{:s}{:s}_{:03d}_dRdt.png'.format(
+            OUTPUT_DIR, 'Nowcast_Var', i)
+        
+        print('Saving ' + exp_full_fname)
+        fig_util.set_size(fig, (1920.0/100.0, 1080.0/100.0), dpi=100, pad_inches=0.35)
+        #fig_util.force_fig_size(fig, (1920.0, 1080.0), dpi=100, pad_inches=0.35)
+        
+        fig.savefig(exp_full_fname, dpi=100, bbox_inches='tight', pad_inches=0.35)
+        display(Image(filename=exp_full_fname))
+        plt.close()

@@ -2,9 +2,13 @@
 data/NPGEO/*
 data/RKI/*
 data/SurvStat/*
-!data/NPGEO/README.*
-!data/RKI/README.*
-!data/SurvStat/README.*
+!data/RKI/Hospitalisierungen
+!data/RKI/Nowcasting
+data/RKI/Hospitalisierungen/*
+data/RKI/Nowcasting/*
+!data/NPGEO/**/README.*
+!data/RKI/**/README.*
+!data/SurvStat/**/README.*
 src/_TODO/
 
 # Output is not part of the repository
