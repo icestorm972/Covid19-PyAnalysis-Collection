@@ -55,6 +55,7 @@ SPECIFIC_DAY = None
 INPUT_DATA_RANGE = ['2021-03-16', dt.now().strftime('%Y-%m-%d')]
 PLOT_MAX_DATE = '2021-12-31'
 
+DO_EXTRAPOLATION = False
 
 
 if not SPECIFIC_DAY is None:
@@ -230,7 +231,10 @@ for i in range(7):
             OUTPUT_DIR + '..\\', 'Nowcast_Var', iwd, WD_ARR[iwd])
         
         print('Saving ' + exp_full_fname)
-        fig_util.set_size(fig, (1920.0/100.0, 1080.0/100.0), dpi=100, pad_inches=0.35)
+        try:
+            fig_util.set_size(fig, (1920.0/100.0, 1080.0/100.0), dpi=100, pad_inches=0.35)
+        except:
+            fig_util.force_fig_size(fig, (1920.0, 1080.0), dpi=100, pad_inches=0.35)
         
         fig.savefig(exp_full_fname, dpi=100, bbox_inches='tight', pad_inches=0.35)
         display(Image(filename=exp_full_fname))
@@ -816,7 +820,7 @@ for i in range(max_num_entries+1):
 
 # %%
 
-if True:
+if DO_EXTRAPOLATION:
     p = np.polyfit([*range(-10,-4)], pd.to_numeric(band_data_min.iloc[-10:-4, -1]).to_numpy(), 2)
     band_data_min.iloc[-4:-1, -1] = np.polyval(p, [-4,-3,-2])
     
@@ -863,28 +867,40 @@ fig.suptitle('COVID-19 - Wochentagkorrigierter Punktschätzer$^{{*)}}$ des RKI 7
 y1 = pd.to_numeric(band_data_min.iloc[:,i].dropna())
 y2 = pd.to_numeric(band_data_max.iloc[:,i].dropna())
 x = y1.index
-plt.fill_between(x[:-3], y1[:-3], y2[:-3], facecolor=(0.0, 0.0, 0.0), alpha=0.2, label='Min/Max Schätz-Intervall')
 Rmin = y1.iloc[-1]
 Rmax = y2.iloc[-1]
-plt.fill_between(x[-4:], y1[-4:], y2[-4:], facecolor=(0.0, 0.0, 0.0), alpha=0.05, label='Min/Max S.-I. extrapoliert')
+
+if DO_EXTRAPOLATION:
+    plt.fill_between(x[:-3], y1[:-3], y2[:-3], facecolor=(0.0, 0.0, 0.0), alpha=0.2, label='Min/Max Schätz-Intervall')
+    plt.fill_between(x[-4:], y1[-4:], y2[-4:], facecolor=(0.0, 0.0, 0.0), alpha=0.05, label='Min/Max S.-I. extrapoliert')
+else:
+    plt.fill_between(x, y1, y2, facecolor=(0.0, 0.0, 0.0), alpha=0.2, label='Min/Max Schätz-Intervall')
+    
 
 
 y1 = pd.to_numeric(band_data_iq95_lo.iloc[:,i].dropna())
 y2 = pd.to_numeric(band_data_iq95_hi.iloc[:,i].dropna())
 x = y1.index    
-plt.fill_between(x[:-3], y1[:-3], y2[:-3], facecolor=(1.0, 0.0, 0.0), alpha=0.8, label='95% Schätz-Intervall')
 R95lo = y1.iloc[-1]
 R95hi = y2.iloc[-1]
-plt.fill_between(x[-4:], y1[-4:], y2[-4:], facecolor=(1.0, 0.0, 0.0), alpha=0.2, label='95% S.-I. extrapoliert')
 
+if DO_EXTRAPOLATION:
+    plt.fill_between(x[:-3], y1[:-3], y2[:-3], facecolor=(1.0, 0.0, 0.0), alpha=0.8, label='95% Schätz-Intervall')
+    plt.fill_between(x[-4:], y1[-4:], y2[-4:], facecolor=(1.0, 0.0, 0.0), alpha=0.2, label='95% S.-I. extrapoliert')
+else:
+    plt.fill_between(x, y1, y2, facecolor=(1.0, 0.0, 0.0), alpha=0.8, label='95% Schätz-Intervall')
 
 y1 = pd.to_numeric(band_data_iq50_lo.iloc[:,i].dropna())
 y2 = pd.to_numeric(band_data_iq50_hi.iloc[:,i].dropna())
 x = y1.index    
-plt.fill_between(x[:-3], y1[:-3], y2[:-3], facecolor=(0.0, 0.0, 1.0), alpha=0.8, label='50% (IQR) Schätz-Intervall')
 R50lo = y1.iloc[-1]
 R50hi = y2.iloc[-1]
-plt.fill_between(x[-4:], y1[-4:], y2[-4:], facecolor=(0.0, 0.0, 1.0), alpha=0.2, label='50% (IQR) S.-I. extrapoliert')
+
+if DO_EXTRAPOLATION:
+    plt.fill_between(x[:-3], y1[:-3], y2[:-3], facecolor=(0.0, 0.0, 1.0), alpha=0.8, label='50% (IQR) Schätz-Intervall')
+    plt.fill_between(x[-4:], y1[-4:], y2[-4:], facecolor=(0.0, 0.0, 1.0), alpha=0.2, label='50% (IQR) S.-I. extrapoliert')
+else:
+    plt.fill_between(x, y1, y2, facecolor=(0.0, 0.0, 1.0), alpha=0.8, label='50% (IQR) Schätz-Intervall')
 
 y = pd.to_numeric(band_data_med.iloc[:,i].dropna())
 x = y.index
@@ -901,8 +917,11 @@ plt.plot(old_boundaries['iq50_hi'].dropna(), color='b', linestyle=':')
 xidz = datasets[dataset_date_str].index[-max_num_entries:]
 v = datasets[dataset_date_str]['Rgeom (Med NowNowcast 7d MA)'].iloc[-max_num_entries:]
 
-plt.plot(x[:-3], y[:-3], 'k-', label= 'Median')
-plt.plot(x[-4:], y[-4:], 'k-', alpha=0.25, label= 'Median extrapoliert')
+if DO_EXTRAPOLATION:
+    plt.plot(x[:-3], y[:-3], 'k-', label= 'Median')
+    plt.plot(x[-4:], y[-4:], 'k-', alpha=0.25, label= 'Median extrapoliert')
+else:
+    plt.plot(x, y, 'k-', label= 'Median')
 
 plt.plot(old_boundaries['med'].dropna(), 'k--', label= 'Historie Median')
 
@@ -933,9 +952,16 @@ ax.set_xlabel('Geschätztes Erkrankungsdatum', fontdict={'fontsize': 18}, fontsi
 leg_handles, leg_labels = ax.get_legend_handles_labels()
 leg_handles = np.asarray(leg_handles)
 leg_labels = np.asarray(leg_labels)
-leg_order = [6, 8, 10, 3, 7, 9, 11, 4, 0, 1, 2, 5]
-ax.legend(leg_handles[leg_order], leg_labels[leg_order], 
-          loc=2, fontsize=14, ncol=3)
+
+if DO_EXTRAPOLATION:
+    leg_order = [6, 8, 10, 3, 7, 9, 11, 4, 0, 1, 2, 5]
+    ax.legend(leg_handles[leg_order], leg_labels[leg_order], 
+              loc=2, fontsize=14, ncol=3)
+else:
+    leg_order = [5, 6, 7, 3, 0, 1, 2, 4]    
+    ax.legend(leg_handles[leg_order], leg_labels[leg_order], 
+              loc=2, fontsize=14, ncol=2)
+    
   
 # Rmin = old_boundaries['min'].dropna().iloc[-1]
 # Rmed = old_boundaries['med'].dropna().iloc[-1]
@@ -953,7 +979,7 @@ Ryden = 3
 Rtext_date = dataset_date - pd.DateOffset(days = min_lut-2-1*3)
 
 plt.text(Rtext_date, Rmed, 
-         '$R_{{med}}: {:.2f}$'.format(Rmed),
+         '$R_{{med}}: {:.3f}$'.format(Rmed),
          color = 'k', verticalalignment='center', fontsize=18)
          
 plt.text(Rtext_date, Rmed + (Ryof + 1.0*Rynum/Ryden), 
@@ -1012,7 +1038,10 @@ else:
         OUTPUT_DIR, 'Nowcast_Var', i)
     
     print('Saving ' + exp_full_fname)
-    fig_util.set_size(fig, (1920.0/100.0, 1080.0/100.0), dpi=100, pad_inches=0.35)
+    try:
+        fig_util.set_size(fig, (1920.0/100.0, 1080.0/100.0), dpi=100, pad_inches=0.35)
+    except:
+        fig_util.force_fig_size(fig, (1920.0, 1080.0), dpi=100, pad_inches=0.35)
     #fig_util.force_fig_size(fig, (1920.0, 1080.0), dpi=100, pad_inches=0.35)
     
     fig.savefig(exp_full_fname, dpi=100, bbox_inches='tight', pad_inches=0.35)
@@ -1034,7 +1063,10 @@ if True:
                     verticalalignment='center', 
                     fontsize=21, color=SLATE, y=0.91)
     
-    plt.fill_between(x[:-4], np.zeros((x.size-4,)), np.diff(y[:-3]), facecolor=(0.0,0.0,1.0))
+    if DO_EXTRAPOLATION:
+        plt.fill_between(x[:-4], np.zeros((x.size-4,)), np.diff(y[:-3]), facecolor=(0.0,0.0,1.0))
+    else:
+        plt.fill_between(x[:-1], np.zeros((x.size-1,)), np.diff(y), facecolor=(0.0,0.0,1.0))
     
     
     
@@ -1094,7 +1126,10 @@ if True:
             OUTPUT_DIR, 'Nowcast_Var', i)
         
         print('Saving ' + exp_full_fname)
-        fig_util.set_size(fig, (1920.0/100.0, 1080.0/100.0), dpi=100, pad_inches=0.35)
+        try:
+            fig_util.set_size(fig, (1920.0/100.0, 1080.0/100.0), dpi=100, pad_inches=0.35)
+        except:
+            fig_util.force_fig_size(fig, (1920.0, 1080.0), dpi=100, pad_inches=0.35)
         #fig_util.force_fig_size(fig, (1920.0, 1080.0), dpi=100, pad_inches=0.35)
         
         fig.savefig(exp_full_fname, dpi=100, bbox_inches='tight', pad_inches=0.35)
